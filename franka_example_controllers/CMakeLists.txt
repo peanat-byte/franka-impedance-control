@@ -79,6 +79,7 @@ add_library(franka_example_controllers
   src/joint_velocity_example_controller.cpp
   src/model_example_controller.cpp
   src/joint_impedance_example_controller.cpp
+  src/impedance_controller_mech_464.cpp
   src/cartesian_impedance_example_controller.cpp
   src/force_example_controller.cpp
   src/dual_arm_cartesian_impedance_example_controller.cpp
