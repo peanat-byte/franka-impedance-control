@@ -19,7 +19,7 @@
 
 // TODO: Also we will need to log and plot position and forces for validation.
 
-#include <franka_example_controllers/joint_impedance_example_controller.h>
+#include <franka_example_controllers/impedance_controller_mech_464.h>
 
 #include <cmath>
 #include <memory>
@@ -32,7 +32,7 @@
 
 namespace franka_example_controllers {
 
-bool JointImpedanceExampleController::init(hardware_interface::RobotHW* robot_hw,
+bool ImpedanceControllerMech464::init(hardware_interface::RobotHW* robot_hw,
                                            ros::NodeHandle& node_handle) {
   std::string arm_id;
   if (!node_handle.getParam("arm_id", arm_id)) {
@@ -146,11 +146,11 @@ bool JointImpedanceExampleController::init(hardware_interface::RobotHW* robot_hw
   return true;
 }
 
-void JointImpedanceExampleController::starting(const ros::Time& /*time*/) {
+void ImpedanceControllerMech464::starting(const ros::Time& /*time*/) {
   initial_pose_ = cartesian_pose_handle_->getRobotState().O_T_EE_d;
 }
 
-void JointImpedanceExampleController::update(const ros::Time& /*time*/,
+void ImpedanceControllerMech464::update(const ros::Time& /*time*/,
                                              const ros::Duration& period) {
   if (vel_current_ < vel_max_) {
     vel_current_ += period.toSec() * std::fabs(vel_max_ / acceleration_time_);
@@ -216,7 +216,7 @@ void JointImpedanceExampleController::update(const ros::Time& /*time*/,
   }
 }
 
-std::array<double, 7> JointImpedanceExampleController::saturateTorqueRate(
+std::array<double, 7> ImpedanceControllerMech464::saturateTorqueRate(
     const std::array<double, 7>& tau_d_calculated,
     const std::array<double, 7>& tau_J_d) {  // NOLINT (readability-identifier-naming)
   std::array<double, 7> tau_d_saturated{};
@@ -229,5 +229,5 @@ std::array<double, 7> JointImpedanceExampleController::saturateTorqueRate(
 
 }  // namespace franka_example_controllers
 
-PLUGINLIB_EXPORT_CLASS(franka_example_controllers::JointImpedanceExampleController,
+PLUGINLIB_EXPORT_CLASS(franka_example_controllers::ImpedanceControllerMech464,
                        controller_interface::ControllerBase)
