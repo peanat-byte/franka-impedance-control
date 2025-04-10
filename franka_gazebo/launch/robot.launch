@@ -107,4 +107,11 @@
         output="screen">
   </node>
 
+  <!-- Plotting and logging stuff -->
+  <!-- <node name="test_logging"
+        pkg="franka_example_controllers"
+        type="test_logging.py"
+        output="screen">
+  </node> -->
+
 </launch>

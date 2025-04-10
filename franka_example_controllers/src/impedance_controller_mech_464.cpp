@@ -204,8 +204,8 @@ void ImpedanceControllerMech464::update(const ros::Time& /*time*/,
   Eigen::Matrix3d adaptive_damping = D_tangent_matrix + D_normal_matrix;
   cartesian_damping_.topLeftCorner(3, 3) = adaptive_damping;
 
-  std::cout << "Cartesian Stiffness Matrix:\n" << cartesian_stiffness_ << std::endl;
-  std::cout.flush();
+  // std::cout << "Cartesian Stiffness Matrix:\n" << cartesian_stiffness_ << std::endl;
+  // std::cout.flush();
   
 
   // compute control
