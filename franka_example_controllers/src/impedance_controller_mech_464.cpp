@@ -23,6 +23,7 @@
 
 #include <cmath>
 #include <memory>
+#include <iostream>
 
 #include <controller_interface/controller_base.h>
 #include <franka/robot_state.h>
@@ -188,7 +189,7 @@ void ImpedanceControllerMech464::update(const ros::Time& /*time*/,
   Eigen::Vector3d normal_dir = position - sphere_center;
   normal_dir.normalize();
 
-  double K_normal = 10.0;
+  double K_normal = 200.0;
   double K_tangent = 400.0;
 
   Eigen::Matrix3d K_normal_matrix = K_normal * (normal_dir * normal_dir.transpose());
@@ -196,10 +197,14 @@ void ImpedanceControllerMech464::update(const ros::Time& /*time*/,
   Eigen::Matrix3d adaptive_stiffness = K_tangent_matrix + K_normal_matrix;
   cartesian_stiffness_.topLeftCorner(3, 3) = adaptive_stiffness;
 
-  // Critical damping matrix (critical damping proportional to the stiffness)
-  Eigen::Matrix3d critical_damping_matrix = 2.0 * (adaptive_stiffness).cwiseSqrt();
-  cartesian_damping_.topLeftCorner(3, 3) = critical_damping_matrix;
+  // TODO: BUG WITH THIS THAT CAUSES ROBOT TO FLOP
+  // // Critical damping matrix (critical damping proportional to the stiffness)
+  // Eigen::Matrix3d critical_damping_matrix = 2.0 * (adaptive_stiffness).cwiseSqrt();
+  // cartesian_damping_.topLeftCorner(3, 3) = critical_damping_matrix;
 
+  // std::cout << "Cartesian Stiffness Matrix:\n" << cartesian_stiffness_ << std::endl;
+  // std::cout.flush();
+  
 
   // compute control
   // allocate variables
