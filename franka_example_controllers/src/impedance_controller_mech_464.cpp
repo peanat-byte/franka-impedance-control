@@ -182,20 +182,21 @@ void ImpedanceControllerMech464::update(const ros::Time& /*time*/,
 
 
   // Known location and shape of curved surface (sphere for now) (CHANGE IF YOU CHANGE THE CURVED SURFACE!!) ------------
-  Eigen::Vector3d sphere_center(0.4, 0.0, 0.0);
+  Eigen::Vector3d sphere_center(0.6, 0.0, 0.0);
   double sphere_radius = 0.25;
 
   // Normal direction to sphere at robot position
   Eigen::Vector3d normal_dir = position - sphere_center;
   normal_dir.normalize();
 
-  double K_normal = 200.0;
-  double K_tangent = 800.0;
+  double K_normal = 200.0; // 200, 800
+  double K_tangent = 800.0; // 800, 1600
 
   Eigen::Matrix3d K_normal_matrix = K_normal * (normal_dir * normal_dir.transpose());
   Eigen::Matrix3d K_tangent_matrix = K_tangent * (Eigen::Matrix3d::Identity() - normal_dir * normal_dir.transpose());
   Eigen::Matrix3d adaptive_stiffness = K_tangent_matrix + K_normal_matrix;
   cartesian_stiffness_.topLeftCorner(3, 3) = adaptive_stiffness;
+  cartesian_stiffness_.bottomRightCorner(3, 3) << 50.0 * Eigen::Matrix3d::Identity(); // Rotational stiffness
 
   // Critical damping matrix (critical damping proportional to the stiffness) 
   // https://robotic.de/fileadmin/robotic/ott/papers/icra2004_II.pdf

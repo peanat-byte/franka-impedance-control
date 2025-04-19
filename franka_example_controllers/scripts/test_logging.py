@@ -108,7 +108,7 @@ class TestLogging:
         
         for i in range(len(self.time_ref)):
             end_effector_pos = np.array([self.x_interp[i], self.y_interp[i], self.z_interp[i]])
-            sphere_center = np.array([0.4, 0.0, 0.0])
+            sphere_center = np.array([0.6, 0.0, 0.0])
 
             # Normal vector
             dir_vector = end_effector_pos - sphere_center
