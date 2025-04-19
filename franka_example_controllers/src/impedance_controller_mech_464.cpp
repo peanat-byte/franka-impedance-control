@@ -182,25 +182,28 @@ void ImpedanceControllerMech464::update(const ros::Time& /*time*/,
 
 
   // Known location and shape of curved surface (sphere for now) (CHANGE IF YOU CHANGE THE CURVED SURFACE!!) ------------
-  Eigen::Vector3d sphere_center(0.4, 0.0, 0.0);
+  Eigen::Vector3d sphere_center(0.6, 0.0, 0.0);
   double sphere_radius = 0.25;
 
   // Normal direction to sphere at robot position
   Eigen::Vector3d normal_dir = position - sphere_center;
   normal_dir.normalize();
 
-  double K_normal = 200.0;
-  double K_tangent = 400.0;
+  double K_normal = 200.0; // 200, 800
+  double K_tangent = 800.0; // 800, 1600
 
   Eigen::Matrix3d K_normal_matrix = K_normal * (normal_dir * normal_dir.transpose());
   Eigen::Matrix3d K_tangent_matrix = K_tangent * (Eigen::Matrix3d::Identity() - normal_dir * normal_dir.transpose());
   Eigen::Matrix3d adaptive_stiffness = K_tangent_matrix + K_normal_matrix;
   cartesian_stiffness_.topLeftCorner(3, 3) = adaptive_stiffness;
+  cartesian_stiffness_.bottomRightCorner(3, 3) << 50.0 * Eigen::Matrix3d::Identity(); // Rotational stiffness
 
-  // TODO: BUG WITH THIS THAT CAUSES ROBOT TO FLOP
-  // // Critical damping matrix (critical damping proportional to the stiffness)
-  // Eigen::Matrix3d critical_damping_matrix = 2.0 * (adaptive_stiffness).cwiseSqrt();
-  // cartesian_damping_.topLeftCorner(3, 3) = critical_damping_matrix;
+  // Critical damping matrix (critical damping proportional to the stiffness) 
+  // https://robotic.de/fileadmin/robotic/ott/papers/icra2004_II.pdf
+  Eigen::Matrix3d D_normal_matrix = 2 * sqrt(K_normal) * (normal_dir * normal_dir.transpose());
+  Eigen::Matrix3d D_tangent_matrix = 2* sqrt(K_tangent) * (Eigen::Matrix3d::Identity() - normal_dir * normal_dir.transpose());
+  Eigen::Matrix3d adaptive_damping = D_tangent_matrix + D_normal_matrix;
+  cartesian_damping_.topLeftCorner(3, 3) = adaptive_damping;
 
   // std::cout << "Cartesian Stiffness Matrix:\n" << cartesian_stiffness_ << std::endl;
   // std::cout.flush();
@@ -272,6 +275,9 @@ void ImpedanceControllerMech464::complianceParamCallback(
   cartesian_damping_target_.bottomRightCorner(3, 3)
       << 2.0 * sqrt(config.rotational_stiffness) * Eigen::Matrix3d::Identity();
   nullspace_stiffness_target_ = config.nullspace_stiffness;
+
+  std::cout << "This shouldn't be called\n" << std::endl;
+  std::cout.flush();
 }
 
 void ImpedanceControllerMech464::equilibriumPoseCallback(
